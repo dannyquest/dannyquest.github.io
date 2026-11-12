@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Monthly Bill Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f4;--card:#fff;--ink:#14213d;--mute:#5b6678;--line:#d5dbe3;--acc:#1f7a5c;--accink:#fff;--bad:#b4442f;--zone:#e2f0ea;--chip:#f4f6f9;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1522;--card:#172033;--ink:#e8ecf4;--mute:#97a3b8;--line:#2b3750;--acc:#46b790;--accink:#08130f;--bad:#ef8a73;--zone:#16302a;--chip:#1f2a42}}
+:root[data-theme="dark"]{--bg:#0e1522;--card:#172033;--ink:#e8ecf4;--mute:#97a3b8;--line:#2b3750;--acc:#46b790;--accink:#08130f;--bad:#ef8a73;--zone:#16302a;--chip:#1f2a42}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(900px 420px at 50% -80px,var(--zone),transparent),var(--bg);color:var(--ink);font:400 16px/1.5 Figtree,system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1,h2,.big{font-family:'Bricolage Grotesque',Figtree,sans-serif;margin:0}
+h1{font-size:1.1rem;font-weight:700;color:var(--mute)}
+h2{font-size:1.7rem;font-weight:700;line-height:1.15;margin:18px 0 4px}
+p.sub{margin:0 0 18px;color:var(--mute)}
+.bar{display:flex;gap:4px;margin-top:10px}.bar i{flex:1;height:4px;border-radius:2px;background:var(--line)}.bar i.on{background:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 8px 28px rgba(20,33,61,.07)}
+button{border-radius:999px!important}input{border-radius:10px}
+.welcome{min-height:calc(100svh - 90px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px 0}
+.avatar{width:172px;height:172px;border-radius:50%;object-fit:cover;border:5px solid var(--card);box-shadow:0 0 0 3px var(--acc),0 20px 44px rgba(20,33,61,.25);margin-bottom:26px}
+.wt{font-size:clamp(2rem,8vw,3rem);letter-spacing:-.02em;line-height:1.05;margin:0 0 12px;max-width:560px}
+.welcome .sub{max-width:420px;margin:0 0 26px;font-size:1.05rem}
+button.go{font-size:1.05rem;padding:14px 38px;box-shadow:0 10px 24px rgba(31,122,92,.35)}
+.hints{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:30px}.hints span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.88rem;color:var(--mute)}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+input{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-width:0}
+input:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.row input:first-child{flex:1}.row input.amt{width:120px;text-align:right}
+button{font:600 .95rem Figtree,sans-serif;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;cursor:pointer}
+button.pri{background:var(--acc);border-color:var(--acc);color:var(--accink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.x{padding:6px 10px;color:var(--mute)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;align-items:center}
+.tot{display:flex;justify-content:space-between;padding:10px 0 0;border-top:1px solid var(--line);margin-top:8px;font-weight:600}
+.big{font-size:2.2rem;font-weight:700}
+.note{color:var(--mute);font-size:.9rem}.bad{color:var(--bad);font-weight:600}.good{color:var(--acc)}
+.board{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:640px){.board{grid-template-columns:1fr}}
+.zone{min-height:140px;border:2px dashed var(--line);border-radius:12px;padding:10px;background:var(--card)}
+.zone.over{background:var(--zone);border-color:var(--acc)}
+.zone h3{margin:0 0 8px;font-size:.95rem;display:flex;justify-content:space-between}
+.chip{display:flex;justify-content:space-between;align-items:center;gap:6px;background:var(--chip);border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin-bottom:6px;cursor:grab;font-size:.92rem}
+.chip b{font-weight:600;white-space:nowrap}.chip span.mv{display:flex;gap:4px}
+.chip button{padding:2px 8px;font-size:.8rem}
+.chip input.sm{width:92px;padding:4px 8px;text-align:right}.chip em{font-style:normal}
+dl{margin:0}dl div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}dt{color:var(--mute)}dd{margin:0;font-weight:600}
+.hero{background:var(--acc);color:var(--accink);border-radius:12px;padding:20px;margin-bottom:12px}
+.hero .big{font-size:2.8rem}
+label.l{display:block;font-weight:600;margin:12px 0 4px}
+@media print{.nav,#bar,button{display:none!important}body{background:#fff}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1 id="hd">Monthly Bill Tracker</h1>
+  <div class="bar" id="bar"></div>
+  <div id="app"></div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=v=>parseFloat(v)||0;
+let uid=0;const nid=()=>++uid;
+const fresh=()=>({step:0,
+ bills:[{id:nid(),name:'',amt:0,pc:0}],
+ pay:[{income:0,save:0},{income:0,save:0}],
+ out:[]});
+let S=fresh();
+const sum=a=>a.reduce((t,x)=>t+x,0);
+const part=(b,p)=>b.pc===3?(p===1?sp1(b):b.amt-sp1(b)):(b.pc===p?b.amt:0);
+const billT=p=>sum(S.bills.map(b=>part(b,p)));
+const left=i=>S.pay[i].income-billT(i+1)-S.pay[i].save;
+const pool=()=>left(0)+left(1);
+const paid=()=>sum(S.out.map(o=>o.pay));
+const LAST=6;
+const sp1=b=>Math.max(0,Math.min(b.sp||0,b.amt));
+const chipS=(b,pc)=>`<div class="chip" draggable="true" data-id="${b.id}"><span>${esc(b.name)} <em class="note">split, of ${money(b.amt)}</em></span>${pc===1?`<input class="amt sm" data-split="${b.id}" type="number" inputmode="decimal" min="0" max="${b.amt}" step="0.01" value="${sp1(b)}" aria-label="Amount of ${esc(b.name)} in paycheck 1">`:`<b data-rest="${b.id}">${money(b.amt-sp1(b))}</b>`}<button data-act="unsplit" data-id="${b.id}">Unsplit</button></div>`;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function nav(back,next,nextLabel,dis){
+ return `<div class="nav"><button data-act="back" ${back?'':'style="visibility:hidden"'}>Back</button><button class="pri" data-act="next" ${dis?'disabled':''}>${nextLabel}</button></div>`;
+}
+const V=[
+// 0 bills
+()=>`<h2>Your bills this month</h2><p class="sub">Edit amounts, remove bills that don’t apply, or add new ones. Bills paid with every paycheck (such as 401k) appear once per paycheck.</p>
+ <div class="card">${S.bills.map(b=>`<div class="row"><input data-bill="${b.id}" data-f="name" value="${esc(b.name)}" aria-label="Bill name"><input class="amt" data-bill="${b.id}" data-f="amt" type="number" inputmode="decimal" min="0" value="${b.amt}" aria-label="Amount"><button class="x" data-act="delbill" data-id="${b.id}" aria-label="Remove ${esc(b.name)}">Remove</button></div>`).join('')}
+ <button data-act="addbill">Add bill</button><div class="tot"><span>Monthly bill total</span><span id="tot">${money(sum(S.bills.map(b=>b.amt)))}</span></div></div>`+nav(0,1,'Assign to paychecks',!S.bills.length),
+// 1 assign
+()=>{const z=(pc,t)=>`<div class="zone" data-pc="${pc}"><h3><span>${t}</span><span id="z${pc}">${pc?money(billT(pc)):''}</span></h3>${S.bills.filter(b=>pc?(b.pc===pc||b.pc===3):b.pc===0).map(b=>b.pc===3?chipS(b,pc):`<div class="chip" draggable="true" data-id="${b.id}"><span>${esc(b.name)}</span><b>${money(b.amt)}</b><span class="mv"><button data-act="mv" data-id="${b.id}" data-pc="1" aria-label="Move ${esc(b.name)} to paycheck 1">1</button><button data-act="mv" data-id="${b.id}" data-pc="2" aria-label="Move ${esc(b.name)} to paycheck 2">2</button><button data-act="split" data-id="${b.id}" aria-label="Split ${esc(b.name)} across both paychecks">Split</button></span></div>`).join('')||'<span class="note">'+(pc?'Drop bills here':'All bills assigned')+'</span>'}</div>`;
+ const un=S.bills.filter(b=>!b.pc).length;
+ return `<h2>Assign bills to paychecks</h2><p class="sub">Drag each bill to paycheck 1 or paycheck 2. On a phone, tap the 1 or 2 button on a bill. Tap Split to divide one bill between both paychecks.</p><div class="board">${z(0,'Unassigned')}${z(1,'Paycheck 1')}${z(2,'Paycheck 2')}</div>${un?`<p class="note">${un} bill${un>1?'s':''} still unassigned.</p>`:''}`+nav(1,1,'Continue to paycheck 1',un>0)},
+// 2,3 paychecks
+(i)=>{const p=i+1;return `<h2>Paycheck ${p}</h2><p class="sub">Enter your income and how much to move to savings.</p><div class="card">
+ <label class="l" for="inc">Paycheck income</label><input id="inc" data-p="${i}" data-k="income" type="number" inputmode="decimal" min="0" value="${S.pay[i].income}">
+ <label class="l">Bills assigned</label>${S.bills.filter(b=>part(b,p)>0).map(b=>`<div class="row" style="margin:0"><span style="flex:1">${esc(b.name)}${b.pc===3?' (split)':''}</span><span>${money(part(b,p))}</span></div>`).join('')||'<span class="note">No bills assigned.</span>'}
+ <div class="tot"><span>Bill total</span><span id="bt">${money(billT(p))}</span></div>
+ <label class="l" for="sv">Transfer to savings</label><input id="sv" data-p="${i}" data-k="save" type="number" inputmode="decimal" min="0" value="${S.pay[i].save}">
+ <div class="tot"><span>Left over from this paycheck</span><span id="lf" class="${left(i)<0?'bad':'good'}">${money(left(i))}</span></div>
+ <p id="warn" class="bad">${left(i)<0?'Bills and savings exceed this paycheck. Lower savings or move a bill.':''}</p></div>`+nav(1,1,i?'Continue to outstanding items':'Continue to paycheck 2')},
+// 4 outstanding
+()=>`<h2>Outstanding items</h2><p class="sub">These balances are not part of your paychecks. Enter an amount from your leftover money to pay toward each one this month, or leave it at 0.</p><div class="card">
+ ${S.out.map(o=>`<div class="row"><input data-out="${o.id}" data-f="name" value="${esc(o.name)}" aria-label="Item name"><input class="amt" data-out="${o.id}" data-f="bal" type="number" inputmode="decimal" min="0" value="${o.bal}" aria-label="Balance" title="Balance"><button class="x" data-act="delout" data-id="${o.id}">Remove</button></div>
+ <div class="row" style="margin-left:12px"><span class="note" style="flex:1">Pay this month</span><input class="amt" data-out="${o.id}" data-f="pay" type="number" inputmode="decimal" min="0" value="${o.pay}" aria-label="Payment toward ${esc(o.name)}"></div>`).join('')}
+ <button data-act="addout">Add outstanding item</button>
+ <div class="tot"><span>Available after bills and savings</span><span>${money(pool())}</span></div>
+ <div class="tot"><span>Applied to outstanding items</span><span id="paid">${money(paid())}</span></div>
+ <div class="tot"><span>Left to spend</span><span id="rem" class="${pool()-paid()<0?'bad':'good'}">${money(pool()-paid())}</span></div>
+ <p id="warn" class="bad">${pool()-paid()<0?'Payments are more than your available leftover.':''}</p></div>`+nav(1,1,'See summary'),
+// 5 summary
+()=>{const inc=S.pay[0].income+S.pay[1].income,bills=billT(1)+billT(2),sav=S.pay[0].save+S.pay[1].save,rem=pool()-paid();
+ return `<h2>Monthly summary</h2><p class="sub">Here is where your two paychecks go.</p>
+ <div class="hero"><div>Left for you to spend</div><div class="big">${money(rem)}</div></div>
+ <div class="card"><dl><div><dt>Paycheck income total</dt><dd>${money(inc)}</dd></div><div><dt>Bill total</dt><dd>${money(bills)}</dd></div><div><dt>Transferred to savings</dt><dd>${money(sav)}</dd></div><div><dt>Paid toward outstanding items</dt><dd>${money(paid())}</dd></div><div><dt>Left to spend</dt><dd>${money(rem)}</dd></div></dl></div>
+ <div class="card" style="margin-top:12px"><dl>${[0,1].map(i=>`<div><dt>Paycheck ${i+1}: ${money(S.pay[i].income)} income, ${money(billT(i+1))} bills, ${money(S.pay[i].save)} savings</dt><dd>${money(left(i))}</dd></div>`).join('')}${S.out.filter(o=>o.pay>0).map(o=>`<div><dt>${esc(o.name)}: ${money(o.bal)} balance</dt><dd>${money(Math.max(o.bal-o.pay,0))} after payment</dd></div>`).join('')}</dl></div>`+`<div class="card" style="margin-top:12px"><h3 style="margin:0 0 4px;font-family:'Bricolage Grotesque',Figtree,sans-serif">Six-month savings forecast</h3><p class="note" style="margin:0 0 8px">${sav>0?'If you transfer '+money(sav)+' to savings every month, as you did this month, here is your total saved by the end of each month.':'No savings transfer entered, so the forecast stays at $0.00. Go back to a paycheck to add one.'}</p><dl>${forecast().map(f=>`<div><dt>${f.month}</dt><dd>${money(f.total)}</dd></div>`).join('')}</dl></div>`+`<div class="card" style="margin-top:12px"><h3 style="margin:0 0 4px;font-family:'Bricolage Grotesque',Figtree,sans-serif">Export your data</h3><p class="note" style="margin:0 0 12px">Download a PDF report of everything you entered, plus the calculated totals.</p><div class="row" style="margin:0"><button class="pri" data-act="exp-pdf">Download PDF</button></div></div>`+nav(1,1,'Start over')}
+];
+
+/* ---------- Export ---------- */
+const r2=n=>Math.round(n*100)/100;
+const asLabel=b=>b.pc===1?'Paycheck 1':b.pc===2?'Paycheck 2':b.pc===3?'Split':'Unassigned';
+// Projects total savings for the next 6 months, assuming this month's savings transfer (both paychecks) repeats
+function forecast(){
+ const m=S.pay[0].save+S.pay[1].save,now=new Date();
+ return Array.from({length:6},(_,i)=>({month:new Date(now.getFullYear(),now.getMonth()+i+1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'}),added:r2(m),total:r2(m*(i+1))}));
+}
+function exportData(){
+ const inc=S.pay[0].income+S.pay[1].income,bills=billT(1)+billT(2),sav=S.pay[0].save+S.pay[1].save;
+ return{
+  exported:new Date().toISOString(),
+  bills:S.bills.map(b=>({name:b.name,amount:b.amt,assignedTo:asLabel(b),paycheck1Portion:r2(part(b,1)),paycheck2Portion:r2(part(b,2))})),
+  paychecks:[0,1].map(i=>({paycheck:i+1,income:S.pay[i].income,billTotal:r2(billT(i+1)),savingsTransfer:S.pay[i].save,leftover:r2(left(i))})),
+  outstandingItems:S.out.map(o=>({name:o.name,balance:o.bal,paymentThisMonth:o.pay,balanceAfterPayment:r2(Math.max(o.bal-o.pay,0))})),
+  forecast:forecast(),
+  summary:{totalIncome:r2(inc),totalBills:r2(bills),totalSavings:r2(sav),paidTowardOutstanding:r2(paid()),leftToSpend:r2(pool()-paid())}
+ };
+}
+function toPDF(){
+ if(!window.jspdf){window.print();return} // library blocked or offline: fall back to the browser's Save as PDF
+ const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'pt',format:'letter'}),d=exportData();
+ const L=48,R=564,B=744;let y=56;
+ const t=s=>String(s).replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[^\x20-\x7E\u00A0-\u00FF]/g,'?');
+ const gap=n=>{if(y+n>B){doc.addPage();y=56}};
+ const head=s=>{gap(60);y+=14;doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(31,122,92);doc.text(s,L,y);y+=6;doc.setDrawColor(213,219,227);doc.line(L,y,R,y);y+=16};
+ const table=(hd,rows)=>{
+  const n=hd.length-1,w=80,fw=R-L-w*n-10,rx=k=>R-w*(n-k);
+  gap(40);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(91,102,120);
+  hd.forEach((h,k)=>k?doc.text(t(h),rx(k),y,{align:'right'}):doc.text(t(h),L,y));y+=14;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(20,33,61);
+  if(!rows.length){doc.setTextColor(91,102,120);doc.text('None entered',L,y);y+=18;return}
+  rows.forEach(r=>{
+   const nm=doc.splitTextToSize(t(r[0]||'(unnamed)'),fw),h=nm.length*13+4;gap(h);
+   doc.text(nm,L,y);r.slice(1).forEach((c,k)=>doc.text(t(c),rx(k+1),y,{align:'right'}));y+=h});
+  y+=4};
+ // Title
+ doc.setFont('helvetica','bold');doc.setFontSize(20);doc.setTextColor(20,33,61);doc.text('Monthly Bill Tracker',L,y);y+=18;
+ doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(91,102,120);doc.text('Exported '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),L,y);y+=22;
+ // Hero
+ doc.setFillColor(31,122,92);doc.roundedRect(L,y,R-L,64,8,8,'F');
+ doc.setTextColor(255,255,255);doc.setFontSize(10);doc.text('Left for you to spend',L+16,y+22);
+ doc.setFont('helvetica','bold');doc.setFontSize(24);doc.text(t(money(d.summary.leftToSpend)),L+16,y+50);y+=64;
+ // Summary
+ const m=d.summary;head('Summary');
+ table(['Item','Amount'],[['Total income',money(m.totalIncome)],['Total bills',money(m.totalBills)],['Transferred to savings',money(m.totalSavings)],['Paid toward outstanding items',money(m.paidTowardOutstanding)],['Left to spend',money(m.leftToSpend)]]);
+ head('Paychecks');
+ table(['Paycheck','Income','Bills','Savings','Leftover'],d.paychecks.map(p=>['Paycheck '+p.paycheck,money(p.income),money(p.billTotal),money(p.savingsTransfer),money(p.leftover)]));
+ head('Six-month savings forecast');
+ doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(91,102,120);
+ doc.text(t(m.totalSavings>0?'Assumes '+money(m.totalSavings)+' is transferred to savings every month, as this month.':'No savings transfer entered, so the forecast stays at $0.00.'),L,y);y+=16;
+ table(['Month','Added','Total saved'],d.forecast.map(f=>[f.month,money(f.added),money(f.total)]));
+ head('Bills');
+ table(['Name','Amount','Assigned to','Paycheck 1','Paycheck 2'],d.bills.map(b=>[b.name,money(b.amount),b.assignedTo,money(b.paycheck1Portion),money(b.paycheck2Portion)]));
+ head('Outstanding items');
+ table(['Name','Balance','Paid this month','After payment'],d.outstandingItems.map(o=>[o.name,money(o.balance),money(o.paymentThisMonth),money(o.balanceAfterPayment)]));
+ // Page numbers
+ const pg=doc.getNumberOfPages();
+ for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(91,102,120);doc.text('Page '+i+' of '+pg,R,768,{align:'right'})}
+ doc.save('monthly-bill-tracker-'+new Date().toISOString().slice(0,10)+'.pdf');
+}
+const W=()=>`<section class="welcome"><div class="avatar" role="img" aria-label="Bill tracker" style="display:grid;place-items:center;background:var(--acc);color:var(--accink);font:700 4.5rem 'Bricolage Grotesque',sans-serif">$</div><h2 class="wt">Monthly Bill Tracker</h2><p class="sub">Plan both paychecks, cover every bill, and see exactly what’s left to spend.</p><button class="pri go" data-act="next">Get started</button><div class="hints"><span>List your bills</span><span>Split across paychecks</span><span>See what’s left</span></div></section>`;
+const STEPS=[W,V[0],V[1],()=>V[2](0),()=>V[2](1),V[3],V[4]];
+function view(keep){
+ $('#hd').hidden=!S.step;$('#bar').innerHTML=S.step?STEPS.slice(1).map((_,i)=>`<i class="${i<S.step?'on':''}"></i>`).join(''):'';
+ $('#app').innerHTML=STEPS[S.step]();
+ if(!keep)window.scrollTo(0,0);
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;
+ const a=b.dataset.act,id=+b.dataset.id;
+ if(a==='back'){S.step--;view()}
+ else if(a==='next'){if(S.step===LAST){S=fresh()}else S.step++;view()}
+ else if(a==='addbill'){S.bills.push({id:nid(),name:'',amt:0,pc:0});view(1)}
+ else if(a==='delbill'){S.bills=S.bills.filter(x=>x.id!==id);view(1)}
+ else if(a==='mv'){S.bills.find(x=>x.id===id).pc=+b.dataset.pc;view(1)}
+ else if(a==='split'){const x=S.bills.find(y=>y.id===id);x.pc=3;x.sp=Math.round(x.amt/2*100)/100;view(1)}
+ else if(a==='unsplit'){S.bills.find(y=>y.id===id).pc=0;view(1)}
+ else if(a==='addout'){S.out.push({id:nid(),name:'',bal:0,pay:0});view(1)}
+ else if(a==='delout'){S.out=S.out.filter(x=>x.id!==id);view(1)}
+ else if(a==='exp-pdf'){toPDF()}
+});
+document.addEventListener('input',e=>{
+ const t=e.target,d=t.dataset;
+ if(d.bill){const b=S.bills.find(x=>x.id===+d.bill);b[d.f]=d.f==='amt'?num(t.value):t.value;$('#tot').textContent=money(sum(S.bills.map(x=>x.amt)))}
+ else if(d.split){const x=S.bills.find(y=>y.id===+d.split);x.sp=num(t.value);$('#z1').textContent=money(billT(1));$('#z2').textContent=money(billT(2));const r=document.querySelector('[data-rest="'+d.split+'"]');if(r)r.textContent=money(x.amt-sp1(x))}
+ else if(d.p!==undefined){const i=+d.p;S.pay[i][d.k]=num(t.value);$('#bt').textContent=money(billT(i+1));$('#lf').textContent=money(left(i));$('#lf').className=left(i)<0?'bad':'good';$('#warn').textContent=left(i)<0?'Bills and savings exceed this paycheck. Lower savings or move a bill.':''}
+ else if(d.out){const o=S.out.find(x=>x.id===+d.out);o[d.f]=d.f==='name'?t.value:num(t.value);
+  $('#paid').textContent=money(paid());const r=pool()-paid();$('#rem').textContent=money(r);$('#rem').className=r<0?'bad':'good';$('#warn').textContent=r<0?'Payments are more than your available leftover.':''}
+});
+let dragId=null;
+document.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('.chip');if(c){dragId=+c.dataset.id;e.dataTransfer.setData('text/plain',String(dragId));e.dataTransfer.effectAllowed='move'}});
+document.addEventListener('dragover',e=>{const z=e.target.closest&&e.target.closest('.zone');if(z){e.preventDefault();z.classList.add('over')}});
+document.addEventListener('dragleave',e=>{const z=e.target.closest&&e.target.closest('.zone');if(z)z.classList.remove('over')});
+document.addEventListener('drop',e=>{const z=e.target.closest&&e.target.closest('.zone');if(!z||dragId==null)return;e.preventDefault();
+ S.bills.find(x=>x.id===dragId).pc=+z.dataset.pc;dragId=null;view(1)});
+view();
+</script>
+</body>
+</html>
